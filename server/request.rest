@@ -1,0 +1,68 @@
+POST http://localhost:3001/register
+Content-Type: application/json
+
+{
+  "email": "admin@admin.com",
+  "username": "Admin",
+  "password": "admin"
+}
+
+###
+POST http://0.0.0.0:3001/login
+Content-Type: application/json
+
+{
+  "email": "admin@admin.com",
+  "password": "admin"
+}
+
+###
+GET http://localhost:3001/foods
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.YWRtaW4.YRO226r5_Hq4lDrSOnPy-DEh2X5ri4UlTphVNIBBPac
+
+{
+  "email": "admin@admin.com"
+}
+
+###
+POST http://localhost:3001/foods
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.YWRtaW4.YRO226r5_Hq4lDrSOnPy-DEh2X5ri4UlTphVNIBBPac
+
+{
+  "email": "admin@admin.com",
+  "entries": [
+    {
+      "date": "01-08-2022",
+      "products": [
+        {
+          "name": "banana",
+          "calories": 250,
+          "price": 20
+        },
+        {
+          "name": "apple",
+          "calories": 200,
+          "price": 10
+        }
+      ]
+    },
+    {
+      "date": "02-08-2022",
+      "products": [
+        {
+          "name": "banana",
+          "calories": 300,
+          "price": 25
+        },
+        {
+          "name": "apple",
+          "calories": 100,
+          "price": 7
+        }
+      ]
+    }
+  ]
+}
+
