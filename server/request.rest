@@ -17,13 +17,8 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3001/foods
-Content-Type: application/json
+GET http://localhost:3001/foods?email=admin@admin.com
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.YWRtaW4.YRO226r5_Hq4lDrSOnPy-DEh2X5ri4UlTphVNIBBPac
-
-{
-  "email": "admin@admin.com"
-}
 
 ###
 POST http://localhost:3001/foods

@@ -11,11 +11,15 @@ import {
 
 const App = () => {
 
-    const [user, setUser] = useState({username: '', accessToken : ''})
+    const [user, setUser] = useState({username: '', access_token : '', email: ''})
 
     useEffect(() => {
-        if (localStorage.getItem('user') !== undefined) {
-            setUser({username: localStorage.getItem('username'), accessToken: localStorage.getItem('access_token')});
+        if ( localStorage.getItem( 'email' ) !== undefined && localStorage.getItem( 'email' ) !== null ) {
+            setUser( {
+                email: localStorage.getItem( 'email' ),
+                username: localStorage.getItem( 'username' ),
+                access_token: localStorage.getItem( 'access_token' )
+            } );
         }
     }, [])
 
@@ -23,8 +27,8 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path='/' exact element={user.username !== '' ? <Navigate to='/Login' /> : <Navigate to='/Dashboard' />} />
-                <Route path='/Login' element={user.username === '' ? <Login /> : <Navigate to='/Dashboard' />} />
-                <Route path='/Dashboard' element={user.username !== '' ? <Main /> : <Navigate to='/Login' /> } />
+                <Route path='/Login' element={user.username === '' ? <Login setUser={setUser} /> : <Navigate to='/Dashboard' />} />
+                <Route path='/Dashboard' element={user.username !== '' ? <Main user={user} setUser={setUser} /> : <Navigate to='/Login' /> } />
             </Routes>
         </Router>
     )
