@@ -3,10 +3,10 @@ import {
     SIGN_OUT_USER
 } from './Constants'
 
-export const signInUser = ( user ) => {
+export const signInUser = ( data ) => {
     return {
         type: SIGN_IN_USER,
-        payload: user
+        payload: data
     }
 }
 

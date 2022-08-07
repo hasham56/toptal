@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import "./AppStyles.css"
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import Cookies from 'universal-cookie'
 import Login from './views/Login/Login'
 import Main from './views/Main/Main'
 import {
@@ -8,30 +9,49 @@ import {
     Route,
     Navigate
 } from "react-router-dom";
+import { signInUser } from './redux/auth/Actions'
+import PageLoader from './Loaders/PageLoader'
+import axios from 'axios'
+import "./AppStyles.css"
 
 const App = () => {
+    const { authenticated } = useSelector( state => state.auth )
+    
+    const [loading, setLoading] = useState(false)
 
-    const [user, setUser] = useState({username: '', access_token : '', email: ''})
+    const dispatch = useDispatch()
+    const cookies = new Cookies()
 
     useEffect(() => {
-        if ( localStorage.getItem( 'email' ) !== undefined && localStorage.getItem( 'email' ) !== null ) {
-            setUser( {
-                email: localStorage.getItem( 'email' ),
-                username: localStorage.getItem( 'username' ),
-                access_token: localStorage.getItem( 'access_token' )
-            } );
+        const token = cookies.get( 'token' )
+        if ( token !== undefined ) {
+            setLoading(true)
+            axios
+                .get( 'http://localhost:3001/verifyAuth', {
+                    headers: {
+                        Authorization: 'Bearer ' + token,
+                    },
+                })
+                .then( ( res ) => {
+                    const user = res.data.user
+                    dispatch( signInUser( {
+                        authenticated: true,
+                        currentUser: user,
+                        token
+                    } ) )
+                    setLoading(false)
+                } )
+                .catch( ( err ) => console.log( err ) )
         }
     }, [])
 
-    return (
-        <Router>
+    return loading ? <PageLoader /> : <Router>
             <Routes>
-                <Route path='/' exact element={user.username !== '' ? <Navigate to='/Login' /> : <Navigate to='/Dashboard' />} />
-                <Route path='/Login' element={user.username === '' ? <Login setUser={setUser} /> : <Navigate to='/Dashboard' />} />
-                <Route path='/Dashboard' element={user.username !== '' ? <Main user={user} setUser={setUser} /> : <Navigate to='/Login' /> } />
+                <Route path='/' exact element={authenticated ? <Navigate to='/Login' /> : <Navigate to='/Dashboard' />} />
+                <Route path='/Login' element={!authenticated ? <Login /> : <Navigate to='/Dashboard' />} />
+                <Route path='/Dashboard' element={authenticated ? <Main /> : <Navigate to='/Login' /> } />
             </Routes>
         </Router>
-    )
 }
 
 export default App

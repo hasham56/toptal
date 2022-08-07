@@ -1,11 +1,16 @@
 import React, { useState } from 'react'
-import './Login.scss'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { Grid, Paper, Input, Button } from '@material-ui/core'
+import { signInUser } from '../../redux/auth/Actions'
+import Cookies from 'universal-cookie'
 import axios from 'axios'
+import './Login.scss'
 
-export default function Login({ setUser }) {
+export default function Login() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const cookies = new Cookies()
 
   const [email, setEmail] = useState('')
   const [validationEmail, setValidationEmail] = useState(false)
@@ -48,15 +53,17 @@ export default function Login({ setUser }) {
       })
       .then((res) => {
         const { data } = res
-        const { access_token, username } = data
-        localStorage.setItem('access_token', String(access_token))
-        localStorage.setItem('email', String(email))
-        localStorage.setItem('username', String(username))
-        setUser({
-          username: String(username),
-          access_token: String(access_token),
-          email: String(email),
-        })
+        const { access_token, user } = data
+
+        cookies.set('token', access_token, { path: '/' })
+
+        dispatch(
+          signInUser({
+            authenticated: true,
+            currentUser: user,
+            token: access_token,
+          }),
+        )
         navigate('/Dashboard')
       })
       .catch((err) => console.log(err))

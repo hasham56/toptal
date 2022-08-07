@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { Grid } from '@material-ui/core'
 import ItemModal from '../../modals/ItemModal'
 import UserManual from './UserManual/UserManual'
@@ -6,17 +7,19 @@ import ItemSection from './ItemSection/ItemSection'
 import axios from 'axios'
 import './Main.scss'
 
-function Main({ user, setUser }) {
-  const [result, setResult] = useState([])
+function Main() {
+  const { currentUser, token } = useSelector((state) => state.auth)
 
+  const [result, setResult] = useState([])
   const [modal, openModal] = useState(false)
 
   useEffect(() => {
-    const email = user.email
+    const email = currentUser.email
+
     axios
       .get(`http://localhost:3001/foods?email=${email}`, {
         headers: {
-          Authorization: 'Bearer ' + user.access_token,
+          Authorization: 'Bearer ' + token,
         },
       })
       .then((res) => {
@@ -45,11 +48,7 @@ function Main({ user, setUser }) {
         sm={12}
       >
         <Grid lg={3} md={4} xs={10}>
-          <UserManual
-            openModal={openModal}
-            username={user.username}
-            setUser={setUser}
-          />
+          <UserManual openModal={openModal} />
         </Grid>
         <Grid lg={7} md={4} xs={10}>
           <ItemSection result={result} />

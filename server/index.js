@@ -78,11 +78,45 @@ app.post( '/login', async ( req, res ) => {
             res.json( {
                 message: 'Login successful!',
                 access_token,
-                username: user.username
+                data: {
+                    username: user.username,
+                    email: user.email,
+                    role: user.role
+                }
             } )
         } else {
             res.send( 'Wrong password!' )
         }
+    } catch ( error ) {
+        console.log( error )
+        res.status( 500 ).send( "User coudn't login!" )
+    }
+} )
+
+app.get( '/verifyAuth', authenticateToken, async ( req, res ) => {
+
+    try {
+        const email = req.email
+
+        if ( !email ) return res.status( 400 ).json( {
+            error: 'User data missing!'
+        } )
+
+        // Get from db
+        const user = await User.findOne( {
+            email
+        } )
+
+        if ( user == null ) return res.status( 400 ).send( "User not found!" )
+
+        res.json( {
+            message: 'Login successful!',
+            user: {
+                username: user.username,
+                email: user.email,
+                role: user.role
+            }
+        } )
     } catch ( error ) {
         console.log( error )
         res.status( 500 ).send( "User coudn't login!" )
@@ -134,14 +168,6 @@ app.post( '/foods', authenticateToken, ( req, res ) => {
     } catch ( error ) {
         console.log( error )
     }
-} )
-
-app.get( '/verifyAuth', authenticateToken, ( req, res ) => {
-
-    res.json( {
-        message: 'User authentication successful!',
-        email: req.email
-    } )
 } )
 
 function authenticateToken( req, res, next ) {

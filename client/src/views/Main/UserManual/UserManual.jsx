@@ -1,16 +1,22 @@
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import Cookies from 'universal-cookie'
+import { useNavigate } from 'react-router-dom'
 import { Grid, Paper, Button } from '@material-ui/core'
 import { capitalize } from '../../../helper/helper'
-import { useNavigate } from 'react-router-dom'
+import { signOutUser } from '../../../redux/auth/Actions'
 
-const UserManual = ({ openModal, username, setUser }) => {
+const UserManual = ({ openModal }) => {
+  const { currentUser } = useSelector((state) => state.auth)
+
+  const dispatch = useDispatch()
+  const cookies = new Cookies()
+
   const navigate = useNavigate()
 
   const logoutBtn = () => {
-    localStorage.setItem('access_token', '')
-    localStorage.setItem('email', '')
-    localStorage.setItem('username', '')
-    setUser({ username: '', access_token: '', email: '' })
+    cookies.remove('token')
+    dispatch(signOutUser())
     navigate('/Login')
   }
 
@@ -34,7 +40,7 @@ const UserManual = ({ openModal, username, setUser }) => {
           Add Item
         </Button>
         <div className="text-heading">Welcome</div>
-        {capitalize(username)}
+        {capitalize(currentUser.username)}
 
         <Button onClick={logoutBtn} variant="contained" color="primary">
           Logout
