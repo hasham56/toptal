@@ -1,0 +1,28 @@
+.m-width-p {
+    min-width: 150px !important;
+}
+
+.calories-container {
+    max-height: 500px;
+    overflow-y: scroll;
+}
+
+.user-container {
+    margin-left: 10%;
+    cursor: pointer;
+    padding: 5% 0 5% 3%;
+    border-radius: 10px;
+
+    transition: .3s background-color, .3s color;
+}
+
+.user-container:hover {
+    background-color: steelblue;
+    color: #fff;
+}
+
+
+::-webkit-scrollbar {
+    width: 10px;
+    display: none;
+}
