@@ -73,7 +73,7 @@ app.post( '/login', async ( req, res ) => {
         )
         if ( check ) {
             // Set Token
-            const access_token = jwt.sign( user.username, process.env.ACCESS_SECRET )
+            const access_token = jwt.sign( user.email, process.env.ACCESS_SECRET )
 
             res.json( {
                 message: 'Login successful!',
@@ -139,7 +139,8 @@ app.post( '/foods', authenticateToken, ( req, res ) => {
 app.get( '/verifyAuth', authenticateToken, ( req, res ) => {
 
     res.json( {
-        message: 'User authentication successful!'
+        message: 'User authentication successful!',
+        email: req.email
     } )
 } )
 
@@ -149,9 +150,9 @@ function authenticateToken( req, res, next ) {
 
     if ( token == null ) return res.status( 401 ).send( 'Login required!' )
 
-    jwt.verify( token, process.env.ACCESS_SECRET, ( err, user ) => {
+    jwt.verify( token, process.env.ACCESS_SECRET, ( err, email ) => {
         if ( err ) return res.status( 403 ).send( 'Wrong authentication!' )
-        req.user = user
+        req.email = email
         next()
     } )
 }
