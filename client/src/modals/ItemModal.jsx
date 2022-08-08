@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Box, Input, Modal } from '@material-ui/core'
+import { useSelector } from 'react-redux'
+import axios from 'axios'
 
 const style = {
   position: 'absolute',
@@ -14,14 +16,115 @@ const style = {
   borderRadius: '20px',
 }
 
-const ItemModal = ({ modal, openModal, setResult }) => {
+const ItemModal = ({ modal, openModal }) => {
+  const { currentUser, token } = useSelector((state) => state.auth)
+  const { data } = useSelector((state) => state.data)
+
   const [date, setDate] = useState('')
   const [name, setName] = useState('')
-  const [calories, setCalories] = useState('')
-  const [price, setPrice] = useState('')
+  const [calories, setCalories] = useState(null)
+  const [price, setPrice] = useState(null)
   const [itemErrorLabel, setItemErrorLabel] = useState('')
 
-  const handleAddItem = () => {}
+  const addNewItem = (data) => {
+    setDate('')
+    setName('')
+    setCalories(null)
+    setPrice(null)
+    openModal(false)
+    setItemErrorLabel('')
+    axios
+      .post(`http://localhost:3001/foods`, data, {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      })
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+  }
+
+  const handleAddItem = () => {
+    if (date === '' || name === '' || calories === null || price === null) {
+      setItemErrorLabel('All values required!')
+      return
+    }
+
+    const newDate = date.split('-').reverse().join('-')
+
+    let found = false
+    let index = null
+    const updatedEntries = {
+      email: currentUser.email,
+      entries: data.entries.map((entry, idx) => {
+        if (entry.date === newDate) {
+          entry.products.push({
+            name,
+            calories: Number(calories),
+            price: Number(price),
+          })
+          found = true
+          index = idx
+        }
+        return entry
+      }),
+    }
+    if (found) {
+      let totalCalories = 0
+      let totalPrice = 0
+      updatedEntries.entries.map((entry, idx) => {
+        if (
+          Number(String(entry.date).split('-')[1]) ===
+          Number(new Date().getMonth()) + 1
+        ) {
+          entry.products.map((product) => {
+            totalPrice += product.price
+            return product
+          })
+        }
+        if (idx === index) {
+          entry.products.map((product) => {
+            totalCalories += product.calories
+            return product
+          })
+        }
+        return entry
+      })
+      if (totalCalories > 2100) {
+        setItemErrorLabel(
+          'You are not allowed more than 2100 calories per day!',
+        )
+        return
+      }
+      if (totalPrice > 1000) {
+        setItemErrorLabel(
+          'You are not allowed more than 1000 dollars per month!',
+        )
+        return
+      }
+      addNewItem(updatedEntries)
+    } else {
+      let updatedEntries = data.entries
+      updatedEntries.push({
+        date: newDate,
+        products: [
+          {
+            name,
+            calories: Number(calories),
+            price: Number(price),
+          },
+        ],
+      })
+      let newEntry = {
+        email: currentUser.email,
+        entries: updatedEntries,
+      }
+      addNewItem(newEntry)
+    }
+  }
 
   return (
     <Modal
@@ -50,6 +153,7 @@ const ItemModal = ({ modal, openModal, setResult }) => {
         <div className="column-flex">
           <Input
             value={calories}
+            type={'number'}
             onChange={(e) => setCalories(e.target.value)}
             placeholder="Calories"
           ></Input>
@@ -57,6 +161,7 @@ const ItemModal = ({ modal, openModal, setResult }) => {
         <div className="column-flex">
           <Input
             value={price}
+            type={'number'}
             onChange={(e) => setPrice(e.target.value)}
             placeholder="Price"
           ></Input>

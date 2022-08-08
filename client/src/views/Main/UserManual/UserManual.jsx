@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import Cookies from 'universal-cookie'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +8,16 @@ import { signOutUser } from '../../../redux/auth/Actions'
 
 const UserManual = ({ openModal }) => {
   const { currentUser } = useSelector((state) => state.auth)
+
+  const [admin, setAdmin] = useState(false)
+
+  useEffect(() => {
+    if (currentUser.role === 'admin') {
+      setAdmin(true)
+    } else {
+      setAdmin(false)
+    }
+  }, [])
 
   const dispatch = useDispatch()
   const cookies = new Cookies()
@@ -30,15 +40,19 @@ const UserManual = ({ openModal }) => {
         lgkui={12}
         sm={12}
       >
-        <Button
-          onClick={() => {
-            openModal(true)
-          }}
-          variant="contained"
-          color="primary"
-        >
-          Add Item
-        </Button>
+        {!admin ? (
+          <Button
+            onClick={() => {
+              openModal(true)
+            }}
+            variant="contained"
+            color="primary"
+          >
+            Add Item
+          </Button>
+        ) : (
+          <></>
+        )}
         <div className="text-heading">Welcome</div>
         {capitalize(currentUser.username)}
 

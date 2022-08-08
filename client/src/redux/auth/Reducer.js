@@ -17,20 +17,12 @@ export const authReducer = ( state = initialState, {
         case SIGN_IN_USER:
             return {
                 authenticated: true,
-                currentUser: {
-                    username: payload.username,
-                    email: payload.email,
-                    role: payload.role
-                },
-                token: payload.token
+                    currentUser: payload.currentUser,
+                    token: payload.token
             }
             case SIGN_OUT_USER:
-                return {
-                    authenticated: false,
-                    currentUser: null,
-                    token: null
-                }
-                default:
-                    return state
+                return initialState
+            default:
+                return state
     }
 }

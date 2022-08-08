@@ -1,15 +1,54 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Grid,
   Divider,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Typography
+  Typography,
 } from '@material-ui/core'
+import { useSelector, useDispatch } from 'react-redux'
 import { capitalize } from '../../../../helper/helper'
+import { setData } from '../../../../redux/data/Actions'
+import axios from 'axios'
 
-const UserView = ({ result }) => {
+const UserView = () => {
+  const { data } = useSelector((state) => state.data)
+  const { currentUser, token } = useSelector((state) => state.auth)
+
+  const [loading, setLoading] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+
+  const dispatch = useDispatch()
+
+  const handleAccordian = (panel) => (e, isExpanded) => {
+    setExpanded(isExpanded ? panel : false)
+  }
+
+  useEffect(() => {
+    const email = currentUser.email
+    setLoading(true)
+    axios
+      .get(`http://localhost:3001/foods?email=${email}`, {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      })
+      .then((res) => {
+        if (res.data.result !== null) {
+          const data = {
+            entries: res.data?.result.entries,
+          }
+          dispatch(setData({ data }))
+          setLoading(false)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <>
       <Grid
@@ -17,9 +56,15 @@ const UserView = ({ result }) => {
         lg={12}
         sm={12}
       >
-        {result.entries.length &&
-          result.entries.map((entry, idx) => (
-            <Accordion key={idx}>
+        {loading ? (
+          <h3>Loading...</h3>
+        ) : data.entries.length ? (
+          data.entries.map((entry, idx) => (
+            <Accordion
+              key={idx}
+              expanded={expanded === `panel${idx + 1}`}
+              onChange={handleAccordian(`panel${idx + 1}`)}
+            >
               <AccordionSummary
                 aria-controls="panel1a-content"
                 id="panel1a-header"
@@ -46,7 +91,10 @@ const UserView = ({ result }) => {
                   </AccordionDetails>
                 ))}
             </Accordion>
-          ))}
+          ))
+        ) : (
+          <h3>No entries found!</h3>
+        )}
       </Grid>
     </>
   )

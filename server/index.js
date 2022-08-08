@@ -25,7 +25,6 @@ app.post( '/register', async ( req, res ) => {
     const hashedPassword = await bcrypt.hash(
         req.body.password, 10
     )
-    console.log( hashedPassword )
     const username = req.body.username.toLowerCase()
     const email = req.body.email.toLowerCase()
     const role = 'user'
@@ -78,7 +77,7 @@ app.post( '/login', async ( req, res ) => {
             res.json( {
                 message: 'Login successful!',
                 access_token,
-                data: {
+                user: {
                     username: user.username,
                     email: user.email,
                     role: user.role
@@ -87,6 +86,44 @@ app.post( '/login', async ( req, res ) => {
         } else {
             res.send( 'Wrong password!' )
         }
+    } catch ( error ) {
+        console.log( error )
+        res.status( 500 ).send( "User coudn't login!" )
+    }
+} )
+
+app.get( '/users', authenticateToken, async ( req, res ) => {
+
+    try {
+        const email = req.email
+
+        const user = await User.findOne( {
+            email
+        } )
+
+        if ( user == null ) return res.status( 400 ).send( "User not found!" )
+
+        if ( user.role === 'admin' ) {
+            User.find()
+                .then( result => {
+                    const users = result
+                        .filter( user => user.role === 'user' )
+                        .map( user => {
+                            let data = {
+                                email: user.email,
+                                username: user.username
+                            }
+                            return data
+                        } )
+                    res.json( {
+                        users
+                    } )
+                } )
+                .catch( err => console.error( err ) )
+        } else {
+            res.status( 403 ).send( "User is not admin!" )
+        }
+
     } catch ( error ) {
         console.log( error )
         res.status( 500 ).send( "User coudn't login!" )
@@ -157,14 +194,44 @@ app.post( '/foods', authenticateToken, ( req, res ) => {
             entries
         } = req.body
 
-        // Pushing to Database
-        const newFood = new Food( {
-            email: email.toLowerCase(),
-            entries
+        Food.deleteOne( {
+            email
+        } ).then( result => {
+            // Pushing to Database
+            const newFood = new Food( {
+                email: email.toLowerCase(),
+                entries
+            } )
+            newFood.save().then( () => {
+                res.status( 200 ).send( 'Food saved successfully!' )
+            } ).catch( err => res.status( 500 ).send( "Food counln't save!" ) )
+        } ).catch( err => {
+            console.error( err )
+            res.status( 500 ).send( "Something went wrong!" )
         } )
-        newFood.save().then( () => {
-            res.status( 200 ).send( 'Food saved successfully!' )
-        } ).catch( err => res.status( 500 ).send( "Food counln't save!" ) )
+    } catch ( error ) {
+        console.log( error )
+    }
+} )
+
+app.put( '/foods', authenticateToken, ( req, res ) => {
+    try {
+        const {
+            email,
+            entries
+        } = req.body
+
+        Food.updateOne( {
+            email
+        }, {
+            $set: {
+                entries: entries
+            }
+        } ).then(
+            result => {
+                res.status( 200 ).send( 'Food edited!' )
+            }
+        ).catch( err => res.status( 500 ).send( "Food counln't save!" ) )
     } catch ( error ) {
         console.log( error )
     }

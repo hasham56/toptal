@@ -2,9 +2,9 @@ POST http://localhost:3001/register
 Content-Type: application/json
 
 {
-  "email": "admin@admin.com",
-  "username": "Admin",
-  "password": "admin"
+  "email": "Lorena@user.com",
+  "username": "Lorena",
+  "password": "lorena"
 }
 
 ###
@@ -12,9 +12,14 @@ POST http://0.0.0.0:3001/login
 Content-Type: application/json
 
 {
-  "email": "admin@admin.com",
-  "password": "admin"
+  "email": "hasham@user.com",
+  "password": "hasham"
 }
+
+###
+GET http://0.0.0.0:3001/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.aGFzaGFtQHVzZXIuY29t.-_Nl64zP4oZoT8pE91HaoatZcm13NiFFMxzp0OUmoWA
 
 ###
 GET http://localhost:3001/foods?email=admin@admin.com
@@ -65,3 +70,43 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.YWRtaW4.YRO226r5_Hq4lDrSOnPy-DEh2X5ri
   ]
 }
 
+###
+PUT http://localhost:3001/foods
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.YWRtaW5AYWRtaW4uY29t.9xpFVcYctFYZ2eYVE_E5uRG72DhDIB537CGQX6YCq7c
+
+{
+  "email": "hasham@user.com",
+  "entries": [
+    {
+      "date": "05-08-2022",
+      "products": [
+        {
+          "name": "banana",
+          "calories": 210,
+          "price": 20
+        },
+        {
+          "name": "apple",
+          "calories": 200,
+          "price": 10
+        }
+      ]
+    },
+    {
+      "date": "08-08-2022",
+      "products": [
+        {
+          "name": "banana",
+          "calories": 300,
+          "price": 25
+        },
+        {
+          "name": "apple",
+          "calories": 100,
+          "price": 7
+        }
+      ]
+    }
+  ]
+}

@@ -54,9 +54,9 @@ export default function Login() {
       .then((res) => {
         const { data } = res
         const { access_token, user } = data
-
+        console.log(res)
         cookies.set('token', access_token, { path: '/' })
-
+        // console.log(user)
         dispatch(
           signInUser({
             authenticated: true,

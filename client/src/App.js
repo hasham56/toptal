@@ -41,7 +41,10 @@ const App = () => {
                     } ) )
                     setLoading(false)
                 } )
-                .catch( ( err ) => console.log( err ) )
+                .catch( ( err ) => {
+                    console.log( err )
+                    setLoading( false )
+                } )
         }
     }, [])
 

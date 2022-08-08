@@ -5,9 +5,13 @@ import {
 import {
     authReducer
 } from "./auth/Reducer";
+import {
+    dataReducer
+} from './data/Reducer'
 
 const rootReducer = combineReducers( {
     auth: authReducer,
+    data: dataReducer
 } )
 
 export const configureStore = () => {
