@@ -72,36 +72,42 @@ const ItemModal = ({ modal, openModal }) => {
         return entry
       }),
     }
+
+    let totalPrice = 0
+    updatedEntries.entries.map((entry) => {
+      if (
+        Number(String(entry.date).split('-')[1]) ===
+        Number(new Date().getMonth()) + 1
+      ) {
+        entry.products.map((product) => {
+          totalPrice += Number(product.price)
+          console.log(totalPrice)
+          return product
+        })
+      }
+      return entry
+    })
+
+    if (totalPrice + Number(price) > 1000) {
+      totalPrice = 0
+      setItemErrorLabel('You are not allowed more than 1000 dollars per month!')
+      return
+    }
+
     if (found) {
       let totalCalories = 0
-      let totalPrice = 0
       updatedEntries.entries.map((entry, idx) => {
-        if (
-          Number(String(entry.date).split('-')[1]) ===
-          Number(new Date().getMonth()) + 1
-        ) {
-          entry.products.map((product) => {
-            totalPrice += product.price
-            return product
-          })
-        }
         if (idx === index) {
           entry.products.map((product) => {
-            totalCalories += product.calories
+            totalCalories += Number(product.calories)
             return product
           })
         }
         return entry
       })
-      if (totalCalories > 2100) {
+      if (totalCalories + Number(calories) > 2100) {
         setItemErrorLabel(
           'You are not allowed more than 2100 calories per day!',
-        )
-        return
-      }
-      if (totalPrice > 1000) {
-        setItemErrorLabel(
-          'You are not allowed more than 1000 dollars per month!',
         )
         return
       }

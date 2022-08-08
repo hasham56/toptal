@@ -28,7 +28,7 @@ const Entries = ({ dataError, email }) => {
     setExpanded(isExpanded ? panel : false)
   }
 
-  const editRequest = ( entries ) => {
+  const editRequest = (entries) => {
     axios
       .put(
         `http://localhost:3001/foods`,
@@ -55,9 +55,9 @@ const Entries = ({ dataError, email }) => {
       let updatedData0 = data.entries
       let products0 = updatedData0[entryId].products
       products0[productId].name = name
-      products0[productId].calories = calories
-      products0[productId].price = price
-      
+      products0[productId].calories = Number(calories)
+      products0[productId].price = Number(price)
+
       editRequest(updatedData0)
 
       let entries = data.entries
